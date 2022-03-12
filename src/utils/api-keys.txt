@@ -1,0 +1,15 @@
+223667d1239871fc4b6eeef8d0d6def8
+
+
+https://api.themoviedb.org/3/movie/550?api_key=223667d1239871fc4b6eeef8d0d6def8
+
+access token : eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyMjM2NjdkMTIzOTg3MWZjNGI2ZWVlZjhkMGQ2ZGVmOCIsInN1YiI6IjYxZmQyNWFjZWVlMTg2MDA5MTFkOTZjNCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.uPjuX67gktlPrFCrY6ZuR7Xm5bZESAcyqvSu8swmOLI
+
+
+https://api.themoviedb.org/3/movie/2334?api_key=223667d1239871fc4b6eeef8d0d6def8
+
+
+/3/movie/${id}?api_key=223667d1239871fc4b6eeef8d0d6def8
+
+
+http://image.tmdb.org/t/p/w300${data.poster_path
