@@ -1,29 +1,74 @@
-import React, { useEffect } from 'react';
-import Navigation from './Components/Navigation.js'
-import Home from './Components/Home.js'
-import Display from './Components/Display.js'
-import { useDispatch} from 'react-redux';
-import { Routes, Route } from 'react-router-dom';
-import { loadBlogs } from './store/Actions/blogActions';
+import React, { useEffect, useState } from "react";
+import axios from "./axios";
+
 const App = () => {
-  const dispatch = useDispatch();
+  const [User, setUser] = useState(null);
 
   useEffect(() => {
+    LoadUser();
+  }, []);
 
-    dispatch(loadBlogs())
+  const LoadUser = () => {
+    axios
+      .get("/api/v1/user/me", {
+        headers: {
+          token: localStorage.getItem("token"),
+        },
+      })
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((err) => console.log(err.response));
+  };
 
-  }, [dispatch])
-  
+  const SubmitHandler = (event) => {
+    event.preventDefault();
+    const { email, password } = event.target;
+    const logindata = {
+      email: email.value,
+      password: password.value,
+    };
+    axios
+      .post("/api/v1/user/login", logindata)
+      .then(({ data }) => {
+        console.log(data);
+        localStorage.setItem("token", data.token);
+      })
+      .catch((err) => console.log(err.response));
+  };
+
+  const GetHomePage = () => {
+    axios
+      .get("/api/v1/user", {
+        headers: {
+          token: localStorage.getItem("token"),
+        },
+      })
+      .then((data) => console.log(data))
+      .catch((err) => console.log(err.response));
+  };
+
+  const Logout = () => {
+    axios
+      .get("/api/v1/user/logout")
+      .then(({ data }) => {
+        console.log(data);
+      })
+      .catch((err) => console.log(err.response));
+  };
 
   return (
-    <>
-      <Navigation />
-      <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/show" element={<Display />} />
-      </Routes>
-    </>
-  )
-}
+    <div>
+      <form onSubmit={SubmitHandler}>
+        <input type="email" name="email" />
+        <input type="password" name="password" />
+        <input type="submit" />
+      </form>
+      {/* <button onClick={GetHomePage}>Get HomePage</button> */}
+      <button onClick={GetHomePage}>Get HomePage</button>
+      <button onClick={Logout}>Logout User</button>
+    </div>
+  );
+};
 
-export default App
+export default App;
