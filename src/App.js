@@ -1,72 +1,86 @@
 import React, { useEffect, useState } from "react";
-import axios from "./axios";
+import { auth } from "./firebase";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+} from "firebase/auth";
 
 const App = () => {
   const [User, setUser] = useState(null);
 
   useEffect(() => {
-    LoadUser();
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser({
+          email: user.email,
+          token: user.accessToken,
+        });
+        console.log("Session Restored");
+      } else {
+        console.log("No User Found!");
+      }
+    });
   }, []);
 
-  const LoadUser = () => {
-    axios
-      .get("/api/v1/user/me", {
-        headers: {
-          token: localStorage.getItem("token"),
-        },
+  const RegisterUser = (e) => {
+    e.preventDefault();
+
+    const email = e.target[0].value;
+    const password = e.target[1].value;
+    createUserWithEmailAndPassword(auth, email, password)
+      .then(({ user }) => {
+        setUser({ email: user.email, token: user.accessToken });
       })
-      .then((data) => {
-        console.log(data);
-      })
-      .catch((err) => console.log(err.response));
+      .catch((error) => console.log(error.code));
   };
 
-  const SubmitHandler = (event) => {
-    event.preventDefault();
-    const { email, password } = event.target;
-    const logindata = {
-      email: email.value,
-      password: password.value,
-    };
-    axios
-      .post("/api/v1/user/login", logindata)
-      .then(({ data }) => {
-        console.log(data);
-        localStorage.setItem("token", data.token);
-      })
-      .catch((err) => console.log(err.response));
-  };
+  const LoginUser = (e) => {
+    e.preventDefault();
 
-  const GetHomePage = () => {
-    axios
-      .get("/api/v1/user", {
-        headers: {
-          token: localStorage.getItem("token"),
-        },
+    const email = e.target[0].value;
+    const password = e.target[1].value;
+    signInWithEmailAndPassword(auth, email, password)
+      .then(({ user }) => {
+        setUser({ email: user.email, token: user.accessToken });
       })
-      .then((data) => console.log(data))
-      .catch((err) => console.log(err.response));
+      .catch((error) => console.log(error.code));
   };
 
   const Logout = () => {
-    axios
-      .get("/api/v1/user/logout")
-      .then(({ data }) => {
-        console.log(data);
-      })
-      .catch((err) => console.log(err.response));
+    signOut(auth)
+      .then(() => setUser(null))
+      .catch((err) => console.log(err.code));
   };
 
   return (
-    <div>
-      <form onSubmit={SubmitHandler}>
-        <input type="email" name="email" />
-        <input type="password" name="password" />
-        <input type="submit" />
+    <div className="container mt-5">
+      {User && (
+        <div className="d-flex justify-content-between alert alert-success">
+          <p>{User.email}</p>
+          <button onClick={Logout} className="btn btn-danger">
+            Logout
+          </button>
+        </div>
+      )}
+
+      <form onSubmit={RegisterUser}>
+        <h3>Register</h3>
+        <input type="email" name="email" placeholder="Email" /> <br /> <br />
+        <input type="password" name="password" placeholder="Password" /> <br />
+        <br />
+        <button>Submit</button>
       </form>
-      {/* <button onClick={GetHomePage}>Get HomePage</button> */}
-      <button onClick={GetHomePage}>Get HomePage</button>
-      <button onClick={Logout}>Logout User</button>
+      <hr />
+      <form onSubmit={LoginUser}>
+        <h3>Login</h3>
+        <input type="email" name="email" placeholder="Email" /> <br /> <br />
+        <input type="password" name="password" placeholder="Password" /> <br />
+        <br />
+        <button>Submit</button>
+      </form>
+      <hr />
     </div>
   );
 };
