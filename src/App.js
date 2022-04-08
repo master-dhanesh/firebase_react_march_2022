@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { auth } from "./firebase";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
-} from "firebase/auth";
+  auth,
+  addDoc,
+  collection,
+  firestore,
+  getDocs,
+} from "./firebase";
 
 const App = () => {
   const [User, setUser] = useState(null);
@@ -54,6 +58,26 @@ const App = () => {
       .catch((err) => console.log(err.code));
   };
 
+  const CreateUser = async (e) => {
+    e.preventDefault();
+
+    const email = e.target[0].value;
+    const name = e.target[1].value;
+    const docRef = await addDoc(collection(firestore, "r6"), {
+      email,
+      name,
+      avatar: null,
+    });
+    console.log(docRef);
+  };
+
+  const GetAllUsers = async () => {
+    const qs = await getDocs(collection(firestore, "r6"));
+    qs.forEach((doc) => {
+      console.log(doc.id, doc.data());
+    });
+  };
+
   return (
     <div className="container mt-5">
       {User && (
@@ -81,6 +105,15 @@ const App = () => {
         <button>Submit</button>
       </form>
       <hr />
+      <form onSubmit={CreateUser}>
+        <h3>Create User</h3>
+        <input type="email" name="email" placeholder="Email" /> <br /> <br />
+        <input type="text" name="name" placeholder="Name" /> <br />
+        <br />
+        <button>Submit</button>
+      </form>
+      <hr />
+      <button onClick={GetAllUsers}>Get All Documents</button>
     </div>
   );
 };
