@@ -9,6 +9,12 @@ import {
   collection,
   firestore,
   getDocs,
+  getDoc,
+  query,
+  where,
+  doc,
+  setDoc,
+  deleteDoc,
 } from "./firebase";
 
 const App = () => {
@@ -78,6 +84,40 @@ const App = () => {
     });
   };
 
+  const SingleUser = async (e) => {
+    e.preventDefault();
+    const email = e.target[0].value;
+    const docRef = doc(collection(firestore, "r6"), "6YwOfhls2yiKQyQK3pkD");
+    const docSnap = await getDoc(docRef);
+    console.log(docSnap.data());
+    // const qu = query(collection(firestore, "r6"), where("email", "==", email));
+    // const qs = await getDocs(qu);
+    // qs.forEach((doc) => {
+    //   console.log(doc.id, " => ", doc.data());
+    // });
+  };
+
+  const UpdateUser = async (e) => {
+    e.preventDefault();
+
+    const email = e.target[0].value;
+    const password = e.target[1].value;
+    await setDoc(doc(collection(firestore, "r6"), "yMmXYadeKyHhj8B4oika"), {
+      name: "Master Dhanesh",
+      email,
+      avatar: "https://localhost/images/sd.jpg",
+    });
+  };
+
+  const DeleteUser = async (e) => {
+    const docRef = await doc(
+      collection(firestore, "r6"),
+      "NPOtBdT2BQrcpyCojSzI"
+    );
+    await deleteDoc(docRef);
+    console.log("User Deleted");
+  };
+
   return (
     <div className="container mt-5">
       {User && (
@@ -114,6 +154,23 @@ const App = () => {
       </form>
       <hr />
       <button onClick={GetAllUsers}>Get All Documents</button>
+      <hr />
+      <form onSubmit={SingleUser}>
+        <h3>Create User</h3>
+        <input type="email" name="email" placeholder="Email" /> <br /> <br />
+        <br />
+        <button>Submit</button>
+      </form>
+      <hr />
+      <form onSubmit={UpdateUser}>
+        <h3>Create User</h3>
+        <input type="email" name="email" placeholder="Email" /> <br /> <br />
+        <input type="text" name="name" placeholder="Name" /> <br />
+        <br />
+        <button>Submit</button>
+      </form>
+      <hr />
+      <button onClick={DeleteUser}>Get All Documents</button>
     </div>
   );
 };
